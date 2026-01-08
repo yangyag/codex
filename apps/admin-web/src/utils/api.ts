@@ -58,8 +58,20 @@ export async function signup(email: string, password: string): Promise<SignupRes
   return handleJson(res, '회원가입에 실패했습니다.');
 }
 
-export async function fetchUsers(token: string, page: number, size: number): Promise<PageResponse<UserSummary>> {
-  const res = await fetch(`${MEMBER_API_BASE}/api/v1/members?page=${page}&size=${size}`, {
+export async function fetchUsers(
+  token: string,
+  page: number,
+  size: number,
+  query?: string
+): Promise<PageResponse<UserSummary>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size)
+  });
+  if (query && query.trim().length > 0) {
+    params.set('q', query.trim());
+  }
+  const res = await fetch(`${MEMBER_API_BASE}/api/v1/members?${params.toString()}`, {
     headers: {
       Authorization: `Bearer ${token}`
     }

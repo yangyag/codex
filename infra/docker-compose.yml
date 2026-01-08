@@ -35,6 +35,7 @@ services:
       DB_USERNAME: msa
       DB_PASSWORD: msa-password
       SERVER_PORT: ${IDENTITY_PORT:-8081}
+      MEMBER_SERVICE_URL: http://member-service:${MEMBER_PORT:-8082}
     ports:
       - "${IDENTITY_PORT:-8081}:${IDENTITY_PORT:-8081}"
     networks:

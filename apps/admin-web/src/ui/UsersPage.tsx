@@ -8,10 +8,11 @@ type Props = {
 
 export default function UsersPage({ token }: Props) {
   const [page, setPage] = useState(0);
+  const [query, setQuery] = useState('');
   const pageSize = 10;
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
-    queryKey: ['users', page],
-    queryFn: () => fetchUsers(token, page, pageSize),
+    queryKey: ['users', page, query],
+    queryFn: () => fetchUsers(token, page, pageSize, query),
     keepPreviousData: true
   });
 
@@ -19,9 +20,20 @@ export default function UsersPage({ token }: Props) {
     <div className="card">
       <div className="row">
         <h2>회원 관리</h2>
-        <button className="btn" onClick={() => refetch()}>
-          새로고침
-        </button>
+        <div className="row gap">
+          <input
+            className="input"
+            placeholder="이메일/이름 검색"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(0);
+            }}
+          />
+          <button className="btn" onClick={() => refetch()}>
+            새로고침
+          </button>
+        </div>
       </div>
       {isLoading && <div>불러오는 중...</div>}
       {isError && <div className="error">목록을 불러오지 못했습니다.</div>}

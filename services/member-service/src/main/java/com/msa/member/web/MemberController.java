@@ -1,6 +1,7 @@
 package com.msa.member.web;
 
 import com.msa.member.application.MemberService;
+import com.msa.member.web.request.MemberCreateRequest;
 import com.msa.member.web.request.MemberStatusUpdateRequest;
 import com.msa.member.web.response.MemberSummaryResponse;
 import com.msa.member.web.response.PageResponse;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +67,18 @@ public class MemberController {
                 updated.getName(),
                 updated.getStatus().name(),
                 updated.getCreatedAt()
+        ));
+    }
+
+    @PostMapping("/sync")
+    public ResponseEntity<MemberSummaryResponse> syncMember(@Valid @RequestBody MemberCreateRequest request) {
+        var saved = memberService.upsert(request);
+        return ResponseEntity.ok(new MemberSummaryResponse(
+                saved.getId(),
+                saved.getEmail(),
+                saved.getName(),
+                saved.getStatus().name(),
+                saved.getCreatedAt()
         ));
     }
 }

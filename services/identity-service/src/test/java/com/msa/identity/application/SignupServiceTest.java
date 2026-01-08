@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 import com.msa.identity.domain.User;
 import com.msa.identity.domain.UserRepository;
 import com.msa.identity.domain.UserRole;
 import com.msa.identity.domain.UserStatus;
+import com.msa.identity.integration.MemberSyncClient;
 import com.msa.identity.web.exception.EmailAlreadyUsedException;
 import com.msa.identity.web.request.SignupRequest;
 import java.util.UUID;
@@ -28,12 +30,15 @@ class SignupServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MemberSyncClient memberSyncClient;
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private SignupService signupService;
 
     @BeforeEach
     void setUp() {
-        signupService = new SignupService(userRepository, passwordEncoder);
+        signupService = new SignupService(userRepository, passwordEncoder, memberSyncClient);
     }
 
     @Test
@@ -56,6 +61,7 @@ class SignupServiceTest {
 
         verify(userRepository).existsByEmail(request.email());
         verify(userRepository).save(any(User.class));
+        verify(memberSyncClient).syncMember(request.email(), "user");
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getEmail()).isEqualTo(request.email());
         assertThat(passwordEncoder.matches(request.password(), saved.getPasswordHash())).isTrue();
@@ -71,5 +77,7 @@ class SignupServiceTest {
         assertThatThrownBy(() -> signupService.signup(request))
                 .isInstanceOf(EmailAlreadyUsedException.class)
                 .hasMessageContaining("이미 사용 중인 이메일");
+
+        verify(memberSyncClient, never()).syncMember(any(), any());
     }
 }
