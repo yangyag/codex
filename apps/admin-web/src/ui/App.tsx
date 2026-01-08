@@ -31,24 +31,7 @@ export default function App() {
           path="/login"
           element={
             token ? (
-              <div className="app-shell">
-                <header className="app-header">
-                  <div className="logo">로그인</div>
-                  <div className="spacer" />
-                  {email && <div className="user">{email}</div>}
-                  <button className="btn" onClick={handleLogout}>
-                    로그아웃
-                  </button>
-                </header>
-                <main className="app-main">
-                  <div className="card">
-                    <p>로그인이 완료되었습니다.</p>
-                    <button className="btn primary" onClick={handleLogout}>
-                      로그아웃
-                    </button>
-                  </div>
-                </main>
-              </div>
+              <Navigate to="/" replace />
             ) : (
               <div className="app-shell">
                 <main className="app-main">
