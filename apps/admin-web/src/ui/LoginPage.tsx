@@ -60,7 +60,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
       <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
       <form onSubmit={handleSubmit} className="form">
         <label>
-          이메일
+          아이디(이메일)
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
         </label>
         <label>
