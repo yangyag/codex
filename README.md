@@ -39,4 +39,3 @@ cd infra
 docker compose up -d
 ```
 - 접속: `http://127.0.0.1:8080/admin`
-- 로그인: 아이디 `admin` / 비밀번호 `yangyag1!`
