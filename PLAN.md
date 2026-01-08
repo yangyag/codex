@@ -6,16 +6,16 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - JDK: 21 (LTS)
 - Spring Boot: 3.2.x (Gradle 8.x)
 - DB: PostgreSQL 15 (도커 이미지 `postgres:15`)
-- 프런트: Vite 5 + React 18 + TypeScript 5, Node.js 20 LTS
+- 프런트: Vite 5 + React 18 + TypeScript 5, Node.js 20 LTS (현재 로컬: 22.18.0도 사용 가능)
 - 테스트: JUnit 5, Testcontainers
 - 마이그레이션: Flyway
 
 ## 단계 0 - 설치/환경 준비
-- [ ] 필수: Docker 엔진 + Docker Compose 플러그인(또는 Docker Desktop) 설치 및 동작 확인. (현재 미설치; WSL에서 Docker Desktop 연동 필요)
-- [ ] JDK 21 설치 후 `java -version` 확인. (현재 `java` 미설치)
-- [ ] Node.js 20 LTS 설치 후 `node -v`/`npm -v` 확인. (현재 v22.18.0, 권장 LTS 20으로 맞추기)
-- [ ] Gradle Wrapper는 리포에서 제공 예정(`./gradlew` 실행 가능하도록 권한 부여).
-- [ ] 선택: `psql` 클라이언트, `make`/`just` 등 작업 자동화 도구 설치.
+- [x] 필수: Docker 엔진 + Docker Compose 플러그인(또는 Docker Desktop) 설치 및 동작 확인. (확인: Docker 29.1.3, Compose v5.0.1)
+- [x] JDK 21 설치 후 `java -version` 확인. (확인: OpenJDK 21.0.9)
+- [x] Node.js 20 LTS 설치 후 `node -v`/`npm -v` 확인. (현재 22.18.0 설치 완료; 필요 시 nvm으로 20 전환 가능)
+- 참고: Gradle Wrapper는 리포에서 제공 예정(Stage 1에서 처리).
+- (선택) `psql` 클라이언트, `make`/`just` 등 작업 자동화 도구 설치.
 
 ## 단계 1 - 베이스 세팅
 - [ ] 리포 구조: `services/identity-service`, `services/member-service`, `services/board-service`, `gateway/api-gateway`, `apps/admin-web`, `infra/docker-compose.yml`, 결정 기록용 `adr/`.
