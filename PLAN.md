@@ -56,6 +56,7 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] 회원 관리 메뉴: 사용자 목록 조회(페이지당 10개), 100명 테스트 데이터 시드, 목록 확인 가능.
 - [x] `http://127.0.0.1:8080/admin` 접속 스모크 확인(수동, 현재 compose 직결).
 - [x] API BASE 자동 설정: 브라우저 호스트 기반(`hostname:8081`) 기본값 적용.
+- [ ] 회원가입 페이지 추가(관리자 계정 외 신규 가입) 및 성공 후 로그인/리다이렉트 플로우.
 
 ## 단계 5 - Member 서비스 + Admin UI
 - [x] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + Postgres 공유 DB, 별도 Flyway 히스토리 테이블.
