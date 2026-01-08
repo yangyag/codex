@@ -52,6 +52,9 @@ export default function UsersPage({ token }: Props) {
       )}
       {data && (
         <div className="pagination">
+          <button className="btn" disabled={page === 0} onClick={() => setPage(0)}>
+            처음
+          </button>
           <button className="btn" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
             이전
           </button>
@@ -64,6 +67,13 @@ export default function UsersPage({ token }: Props) {
             onClick={() => setPage((p) => p + 1)}
           >
             다음
+          </button>
+          <button
+            className="btn"
+            disabled={page + 1 >= data.totalPages}
+            onClick={() => setPage(Math.max(0, data.totalPages - 1))}
+          >
+            끝
           </button>
         </div>
       )}
