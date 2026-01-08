@@ -5,9 +5,10 @@ type Props = {
   onLogin: (token: string, email: string) => void;
   defaultEmail?: string;
   defaultPassword?: string;
+  allowSignup?: boolean;
 };
 
-export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword = '' }: Props) {
+export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword = '', allowSignup = true }: Props) {
   type Mode = 'login' | 'signup';
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState(defaultEmail);
@@ -15,6 +16,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
   const [confirm, setConfirm] = useState(defaultPassword);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const currentMode: Mode = allowSignup ? mode : 'login';
 
   const validate = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,7 +28,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
       setError('비밀번호는 8자 이상이어야 합니다.');
       return false;
     }
-    if (mode === 'signup' && password !== confirm) {
+    if (currentMode === 'signup' && password !== confirm) {
       setError('비밀번호가 일치하지 않습니다.');
       return false;
     }
@@ -42,14 +44,17 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
         setLoading(false);
         return;
       }
-      if (mode === 'signup') {
+      if (currentMode === 'signup') {
         await signup(email, password);
       }
       const res = await login(email, password);
       onLogin(res.token, res.email);
     } catch (err) {
       const message = err instanceof Error ? err.message : null;
-      setError(message || (mode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.'));
+      setError(
+        message ||
+          (currentMode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.')
+      );
     } finally {
       setLoading(false);
     }
@@ -57,7 +62,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
 
   return (
     <div className="card">
-      <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
+      <h2>{currentMode === 'login' ? '로그인' : '회원가입'}</h2>
       <form onSubmit={handleSubmit} className="form">
         <label>
           아이디(이메일)
@@ -72,7 +77,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
             placeholder="••••••••"
           />
         </label>
-        {mode === 'signup' && (
+        {currentMode === 'signup' && (
           <label>
             비밀번호 확인
             <input
@@ -85,18 +90,20 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
         )}
         {error && <div className="error">{error}</div>}
         <button className="btn primary" type="submit" disabled={loading}>
-          {loading ? '처리 중...' : mode === 'login' ? '로그인' : '회원가입'}
+          {loading ? '처리 중...' : currentMode === 'login' ? '로그인' : '회원가입'}
         </button>
-        <div className="toggle-row">
-          <small className="hint">{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}</small>
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-          >
-            {mode === 'login' ? '회원가입' : '로그인'}
-          </button>
-        </div>
+        {allowSignup && (
+          <div className="toggle-row">
+            <small className="hint">{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}</small>
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+            >
+              {mode === 'login' ? '회원가입' : '로그인'}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );
