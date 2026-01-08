@@ -1,0 +1,67 @@
+# 프로젝트 계획 (모노레포)
+
+MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황에 따라 체크박스를 업데이트하세요.
+
+## 기본 스택/버전
+- JDK: 21 (LTS)
+- Spring Boot: 3.2.x (Gradle 8.x)
+- DB: PostgreSQL 15 (도커 이미지 `postgres:15`)
+- 프런트: Vite 5 + React 18 + TypeScript 5, Node.js 20 LTS
+- 테스트: JUnit 5, Testcontainers
+- 마이그레이션: Flyway
+
+## 단계 0 - 설치/환경 준비
+- [ ] 필수: Docker 엔진 + Docker Compose 플러그인(또는 Docker Desktop) 설치 및 동작 확인.
+- [ ] JDK 21 설치 후 `java -version` 확인.
+- [ ] Node.js 20 LTS 설치 후 `node -v`/`npm -v` 확인. (원하면 pnpm/yarn 선택)
+- [ ] Gradle Wrapper는 리포에서 제공 예정(`./gradlew` 실행 가능하도록 권한 부여).
+- [ ] 선택: `psql` 클라이언트, `make`/`just` 등 작업 자동화 도구 설치.
+
+## 단계 1 - 베이스 세팅
+- [ ] 리포 구조: `services/identity-service`, `services/member-service`, `services/board-service`, `gateway/api-gateway`, `apps/admin-web`, `infra/docker-compose.yml`, 결정 기록용 `adr/`.
+- [ ] 공통 도구: Gradle wrapper, JDK 21 기본선, `.editorconfig`, `README.md`, ADR 템플릿.
+- [ ] Dev/CI 기본: 웹용 Prettier/ESLint, 기본 CI 워크플로(빌드/테스트), git hooks(선택).
+- [ ] Docker Compose 베이스: Postgres 서비스, 공유 네트워크, 환경 변수 템플릿, 네임드 볼륨.
+
+## 단계 2 - Identity 스켈레톤
+- [ ] Spring Boot 3 스캐폴드(Web, Validation, Data JPA, Flyway, PostgreSQL driver).
+- [ ] 도메인: `users` 집합(id, 이메일 고유, BCrypt 비밀번호 해시, role, status, 생성/수정 시각).
+- [ ] Flyway 마이그레이션으로 `users` 테이블 생성.
+- [ ] 회원가입 엔드포인트(요청 검증, 이메일 중복 방어, 비밀번호 해싱).
+- [ ] 테스트: 가입 서비스 단위 테스트, Testcontainers 통합 테스트(마이그레이션+리포지토리+가입 흐름).
+- [ ] Dockerfile 작성 및 compose 서비스 엔트리.
+
+## 단계 3 - 인증 + 게이트웨이
+- [ ] 로그인 엔드포인트(이메일+비밀번호, JWT 액세스 토큰, 필요 시 리프레시 토큰).
+- [ ] JWT 프로바이더(HS256 키, 만료 설정), 인증 오류 모델.
+- [ ] 시큐리티 설정: 패스워드 인코더, 인증 매니저, 보호 경로용 Bearer 필터.
+- [ ] Spring Cloud Gateway 스캐폴드: identity(및 향후 서비스) 라우팅, JWT 검증 필터, CORS 규칙.
+- [ ] Compose 업데이트: gateway ↔ identity ↔ Postgres 연동; 스모크 테스트 스크립트 또는 Postman 컬렉션.
+
+## 단계 4 - Admin Web (초기)
+- [ ] Vite + React + TypeScript 스캐폴드, Tailwind, TanStack Query, React Router, react-hook-form.
+- [ ] 인증 인지 API 클라이언트(fetch/axios), 토큰 저장(localStorage) + 리프레시 처리(사용 시).
+- [ ] 페이지: 회원가입, 로그인; 성공 시 토큰 저장 후 보호 영역으로 리다이렉트.
+- [ ] Admin 레이아웃 셸(헤더/내비 플레이스홀더)과 보호 라우트 가드.
+- [ ] 기본 테스트: 폼 컴포넌트 스냅샷/인터랙션, lint/prettier 스크립트.
+
+## 단계 5 - Member 서비스 + Admin UI
+- [ ] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
+- [ ] 도메인: 멤버 프로필/상태/역할; 멤버 테이블 마이그레이션.
+- [ ] API: 멤버 목록/검색, 상세 조회, 상태/역할 업데이트.
+- [ ] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트.
+- [ ] Admin Web: 멤버 목록(검색/페이지네이션), 상세 드로어, 상태 토글.
+
+## 단계 6 - Board 서비스 + Admin UI
+- [ ] `board-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
+- [ ] 도메인: 게시판(이름, 공개 범위), 게시글(board_id, author_id, 제목, 본문, 상태, 타임스탬프).
+- [ ] API: 게시판/게시글 CRUD, 페이지네이션/필터링, 소유/역할 검사.
+- [ ] Admin Web: 게시판 관리, 게시글 목록, 작성/수정.
+
+## 단계 7 - 품질 + 운영
+- [ ] 가시성: 구조화 로깅, 요청 ID, Micrometer 메트릭, OpenTelemetry 트레이싱 훅.
+- [ ] 오류 모델: 일관된 문제 응답, 글로벌 예외 핸들러.
+- [ ] 보안 강화: 보안 헤더, 게이트웨이 레이트 리밋, 환경 변수 기반 시크릿 관리.
+- [ ] CI/CD: 빌드/테스트, 도커 이미지 빌드/푸시, compose/k8s 스모크 잡; SBOM/스캔(선택).
+- [ ] k8s 준비: minikube 매니페스트 또는 Helm 차트(서비스, 게이트웨이, Postgres).
+- [ ] 런북: 기동/종료, 스모크 체크리스트, DB 백업/복구.
