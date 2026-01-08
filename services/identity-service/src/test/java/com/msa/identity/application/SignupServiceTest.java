@@ -42,7 +42,7 @@ class SignupServiceTest {
     }
 
     @Test
-    void 이메일이_없으면_사용자를_생성한다() {
+    void create_user_when_email_not_exists() {
         SignupRequest request = new SignupRequest("user@example.com", "password123");
         given(userRepository.existsByEmail(eq(request.email()))).willReturn(false);
         given(userRepository.save(any(User.class))).willAnswer(invocation -> {
@@ -70,7 +70,7 @@ class SignupServiceTest {
     }
 
     @Test
-    void 이메일이_존재하면_예외를_발생시킨다() {
+    void throw_exception_when_email_exists() {
         SignupRequest request = new SignupRequest("user@example.com", "password123");
         given(userRepository.existsByEmail(request.email())).willReturn(true);
 

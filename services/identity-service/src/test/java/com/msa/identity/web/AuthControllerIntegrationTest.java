@@ -6,6 +6,7 @@ import com.msa.identity.domain.User;
 import com.msa.identity.domain.UserRepository;
 import com.msa.identity.web.request.SignupRequest;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +73,11 @@ class AuthControllerIntegrationTest {
         userRepository.deleteAll();
     }
 
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
     @AfterAll
     void stopContainer() {
         if (postgres != null && postgres.isRunning()) {
@@ -80,7 +86,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    void 가입_요청이_성공하면_201을_반환한다() {
+    void signup_returns_201_on_success() {
         SignupRequest request = new SignupRequest("integration@example.com", "password123");
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<SignupRequest> entity = new HttpEntity<>(request, headers);
@@ -98,5 +104,74 @@ class AuthControllerIntegrationTest {
 
         User persisted = userRepository.findByEmail(request.email()).orElseThrow();
         assertThat(persisted.getEmail()).isEqualTo(request.email());
+    }
+
+    @Test
+    void login_returns_token_on_success() {
+        SignupRequest signup = new SignupRequest("login-success@example.com", "password123");
+        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/auth/signup", signup, Map.class);
+
+        Map<String, String> loginRequest = Map.of(
+                "email", signup.email(),
+                "password", signup.password()
+        );
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                "http://localhost:" + port + "/api/v1/auth/login",
+                loginRequest,
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().get("token")).isNotNull();
+        assertThat(response.getBody().get("email")).isEqualTo(signup.email());
+    }
+
+    @Test
+    void login_returns_401_when_password_incorrect() {
+        SignupRequest signup = new SignupRequest("login-fail@example.com", "password123");
+        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/auth/signup", signup, Map.class);
+
+        Map<String, String> loginRequest = Map.of(
+                "email", signup.email(),
+                "password", "wrong-password"
+        );
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                "http://localhost:" + port + "/api/v1/auth/login",
+                loginRequest,
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void signup_returns_409_on_duplicate_email() {
+        SignupRequest signup = new SignupRequest("duplicate@example.com", "password123");
+        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/auth/signup", signup, Map.class);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                "http://localhost:" + port + "/api/v1/auth/signup",
+                signup,
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void signup_returns_400_on_invalid_input() {
+        Map<String, String> badRequest = Map.of(
+                "email", "",
+                "password", ""
+        );
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(
+                "http://localhost:" + port + "/api/v1/auth/signup",
+                badRequest,
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
