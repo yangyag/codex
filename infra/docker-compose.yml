@@ -40,6 +40,19 @@ services:
     networks:
       - msa-net
 
+  admin-web:
+    build:
+      context: ../apps/admin-web
+    container_name: admin-web
+    depends_on:
+      - identity-service
+    environment:
+      - VITE_API_BASE=http://identity-service:${IDENTITY_PORT:-8081}
+    ports:
+      - "8080:8080"
+    networks:
+      - msa-net
+
 networks:
   msa-net:
     driver: bridge

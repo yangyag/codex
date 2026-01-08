@@ -38,23 +38,23 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] Dockerfile 작성 및 compose 서비스 엔트리.
 
 ## 단계 3 - 인증 + 게이트웨이
-- [ ] 로그인 엔드포인트(이메일+비밀번호, JWT 액세스 토큰, 필요 시 리프레시 토큰).
-- [ ] JWT 프로바이더(HS256 키, 만료 설정), 인증 오류 모델.
-- [ ] 시큐리티 설정: 패스워드 인코더, 인증 매니저, 보호 경로용 Bearer 필터.
-- [ ] Spring Cloud Gateway 스캐폴드: identity(및 향후 서비스) 라우팅, JWT 검증 필터, CORS 규칙.
-- [ ] Compose 업데이트: gateway ↔ identity ↔ Postgres 연동; 스모크 테스트 스크립트 또는 Postman 컬렉션.
-- [ ] 기본 관리자 계정(admin/yangyag1!) 생성 시드 또는 관리 플로우 마련.
-- [ ] 서비스 바인드 주소를 `0.0.0.0`으로 노출.
+- [x] 로그인 엔드포인트(이메일+비밀번호, JWT 액세스 토큰).
+- [x] JWT 프로바이더(HS256 키, 만료 설정), 인증 오류 모델.
+- [x] 시큐리티 설정: 패스워드 인코더, 인증 매니저, 보호 경로용 Bearer 필터.
+- [ ] Spring Cloud Gateway 스캐폴드: identity(및 향후 서비스) 라우팅, JWT 검증 필터, CORS 규칙. *(보류, 현재 identity 직결)*
+- [x] Compose 업데이트: gateway ↔ identity ↔ Postgres 연동; 스모크 테스트 스크립트 또는 Postman 컬렉션. *(identity + admin-web + postgres 구성 완료)*
+- [x] 기본 관리자 계정(admin/yangyag1!) 시드.
+- [x] 서비스 바인드 주소를 `0.0.0.0`으로 노출.
 
 ## 단계 4 - Admin Web (초기)
-- [ ] Vite + React + TypeScript 스캐폴드, Tailwind, TanStack Query, React Router, react-hook-form.
-- [ ] 인증 인지 API 클라이언트(fetch/axios), 토큰 저장(localStorage) + 리프레시 처리(사용 시).
-- [ ] 페이지: 회원가입, 로그인; 성공 시 토큰 저장 후 보호 영역으로 리다이렉트.
-- [ ] Admin 레이아웃 셸(헤더/내비 플레이스홀더)과 보호 라우트 가드.
-- [ ] 기본 테스트: 폼 컴포넌트 스냅샷/인터랙션, lint/prettier 스크립트.
-- [ ] 관리자 페이지 경로: `/admin` 노출, 서버 바인드 `0.0.0.0`.
-- [ ] 회원 관리 메뉴: 사용자 목록 조회(페이지당 10개), 100명 테스트 데이터 시드, 목록 확인 가능.
-- [ ] 프록시/게이트웨이를 통해 `http://127.0.0.1:8080/admin` 접속 시 관리자 UI 노출 확인.
+- [x] Vite + React + TypeScript 스캐폴드, TanStack Query, React Router.
+- [x] 인증 인지 API 클라이언트(fetch), 토큰 저장(localStorage).
+- [ ] 페이지: 회원가입, 로그인; 성공 시 토큰 저장 후 보호 영역으로 리다이렉트. *(로그인 완료, 회원가입 UI 미구현)*
+- [x] Admin 레이아웃 셸과 보호 라우트 가드(로그인 상태 전환).
+- [ ] 기본 테스트: 컴포넌트 테스트/린트. *(미작성)*
+- [x] 관리자 페이지 경로: `/admin` 노출, 서버 바인드 `0.0.0.0`.
+- [x] 회원 관리 메뉴: 사용자 목록 조회(페이지당 10개), 100명 테스트 데이터 시드, 목록 확인 가능.
+- [ ] 프록시/게이트웨이를 통해 `http://127.0.0.1:8080/admin` 접속 시 관리자 UI 노출 확인(수동 스모크 필요).
 
 ## 단계 5 - Member 서비스 + Admin UI
 - [ ] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
