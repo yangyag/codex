@@ -21,6 +21,25 @@ services:
     networks:
       - msa-net
 
+  identity-service:
+    build:
+      context: ../services/identity-service
+    container_name: identity-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: msa
+      DB_USERNAME: msa
+      DB_PASSWORD: msa-password
+      SERVER_PORT: ${IDENTITY_PORT:-8081}
+    ports:
+      - "${IDENTITY_PORT:-8081}:${IDENTITY_PORT:-8081}"
+    networks:
+      - msa-net
+
 networks:
   msa-net:
     driver: bridge

@@ -1,0 +1,7 @@
+package com.msa.identity.web.exception;
+
+public class EmailAlreadyUsedException extends RuntimeException {
+    public EmailAlreadyUsedException(String email) {
+        super("이미 사용 중인 이메일입니다: " + email);
+    }
+}

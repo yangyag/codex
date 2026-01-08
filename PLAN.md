@@ -4,7 +4,7 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 
 ## 기본 스택/버전
 - JDK: 21 (LTS)
-- Spring Boot: 3.2.x (Gradle 8.x)
+- Spring Boot: 3.5.x (Gradle 8.x)
 - DB: PostgreSQL 15 (도커 이미지 `postgres:15`)
 - 프런트: Vite 5 + React 18 + TypeScript 5, Node.js 20 LTS (현재 로컬: 22.18.0도 사용 가능)
 - 테스트: JUnit 5, Testcontainers
@@ -24,12 +24,12 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] Docker Compose 베이스: Postgres 서비스, 공유 네트워크, 환경 변수 템플릿, 네임드 볼륨.
 
 ## 단계 2 - Identity 스켈레톤
-- [ ] Spring Boot 3 스캐폴드(Web, Validation, Data JPA, Flyway, PostgreSQL driver).
-- [ ] 도메인: `users` 집합(id, 이메일 고유, BCrypt 비밀번호 해시, role, status, 생성/수정 시각).
-- [ ] Flyway 마이그레이션으로 `users` 테이블 생성.
-- [ ] 회원가입 엔드포인트(요청 검증, 이메일 중복 방어, 비밀번호 해싱).
-- [ ] 테스트: 가입 서비스 단위 테스트, Testcontainers 통합 테스트(마이그레이션+리포지토리+가입 흐름).
-- [ ] Dockerfile 작성 및 compose 서비스 엔트리.
+- [x] Spring Boot 3 스캐폴드(Web, Validation, Data JPA, Flyway, PostgreSQL driver).
+- [x] 도메인: `users` 집합(id, 이메일 고유, BCrypt 비밀번호 해시, role, status, 생성/수정 시각).
+- [x] Flyway 마이그레이션으로 `users` 테이블 생성.
+- [x] 회원가입 엔드포인트(요청 검증, 이메일 중복 방어, 비밀번호 해싱).
+- [x] 테스트: 가입 서비스 단위 테스트, Testcontainers 통합 테스트(마이그레이션+리포지토리+가입 흐름).
+- [x] Dockerfile 작성 및 compose 서비스 엔트리.
 
 ## 단계 3 - 인증 + 게이트웨이
 - [ ] 로그인 엔드포인트(이메일+비밀번호, JWT 액세스 토큰, 필요 시 리프레시 토큰).
