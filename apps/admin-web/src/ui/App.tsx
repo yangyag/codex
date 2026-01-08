@@ -70,7 +70,31 @@ export default function App() {
             </div>
           }
         />
-        <Route path="*" element={<Navigate to="/admin" replace />} />
+        <Route
+          path="/"
+          element={
+            token ? (
+              <div className="app-shell">
+                <header className="app-header">
+                  <div className="logo">홈</div>
+                  <div className="spacer" />
+                  {email && <div className="user">{email}</div>}
+                  <button className="btn" onClick={handleLogout}>
+                    로그아웃
+                  </button>
+                </header>
+                <main className="app-main">
+                  <div className="card">
+                    <p>로그인이 완료되었습니다. 상단 버튼으로 로그아웃할 수 있습니다.</p>
+                  </div>
+                </main>
+              </div>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </QueryClientProvider>
   );
