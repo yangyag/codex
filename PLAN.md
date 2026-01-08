@@ -60,6 +60,7 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] 회원가입 시 아이디(이메일) 중복 검사 및 이메일 형식 검증 반영.
 - [x] 회원가입 시 member-service로 사용자 동기화 연계.
 - [x] 라우팅 분리: `/admin`은 관리자 로그인+회원 관리 전용, `/login`은 로그인/회원가입 전용(로그인 성공 시 빈 화면/후속 페이지).
+- [ ] 코드 리팩터: 서비스 인터페이스/구현체 분리, 도메인 생성 팩토리 도입, 핵심 유스케이스를 커맨드/핸들러 구조로 정리(우선 Identity/Member 서비스부터 적용).
 
 ## 단계 5 - Member 서비스 + Admin UI
 - [x] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + Postgres 공유 DB, 별도 Flyway 히스토리 테이블.

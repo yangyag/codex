@@ -1,16 +1,17 @@
 package com.msa.identity.application;
 
+import com.msa.identity.application.command.LoginCommand;
+import com.msa.identity.application.port.AuthUseCase;
 import com.msa.identity.domain.User;
 import com.msa.identity.domain.UserRepository;
 import com.msa.identity.security.JwtProvider;
 import com.msa.identity.web.exception.InvalidCredentialsException;
-import com.msa.identity.web.request.LoginRequest;
 import com.msa.identity.web.response.AuthResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
+public class AuthService implements AuthUseCase {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -22,11 +23,12 @@ public class AuthService {
         this.jwtProvider = jwtProvider;
     }
 
-    public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new InvalidCredentialsException());
+    @Override
+    public AuthResponse login(LoginCommand command) {
+        User user = userRepository.findByEmail(command.email())
+                .orElseThrow(InvalidCredentialsException::new);
 
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
             throw new InvalidCredentialsException();
         }
 

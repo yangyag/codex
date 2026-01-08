@@ -1,5 +1,6 @@
 package com.msa.identity.integration;
 
+import com.msa.identity.application.port.MemberSyncPort;
 import com.msa.identity.config.MemberServiceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
-public class MemberSyncClient {
+public class MemberSyncClient implements MemberSyncPort {
 
     private static final Logger log = LoggerFactory.getLogger(MemberSyncClient.class);
 
@@ -18,6 +19,7 @@ public class MemberSyncClient {
         this.restClient = builder.baseUrl(properties.getUrl()).build();
     }
 
+    @Override
     public void syncMember(String email, String name) {
         try {
             restClient.post()

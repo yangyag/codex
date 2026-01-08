@@ -1,6 +1,9 @@
 package com.msa.member.web;
 
-import com.msa.member.application.MemberService;
+import com.msa.member.application.command.SearchMembersCommand;
+import com.msa.member.application.command.SyncMemberCommand;
+import com.msa.member.application.command.UpdateMemberStatusCommand;
+import com.msa.member.application.port.MemberUseCase;
 import com.msa.member.web.request.MemberCreateRequest;
 import com.msa.member.web.request.MemberStatusUpdateRequest;
 import com.msa.member.web.response.MemberSummaryResponse;
@@ -24,10 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/members")
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberUseCase memberUseCase;
 
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
+    public MemberController(MemberUseCase memberUseCase) {
+        this.memberUseCase = memberUseCase;
     }
 
     @GetMapping
@@ -37,7 +40,7 @@ public class MemberController {
             @RequestParam(required = false) String q
     ) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<MemberSummaryResponse> result = memberService.list(q, pageable)
+        Page<MemberSummaryResponse> result = memberUseCase.list(new SearchMembersCommand(q, pageable))
                 .map(m -> new MemberSummaryResponse(
                         m.getId(),
                         m.getEmail(),
@@ -60,7 +63,7 @@ public class MemberController {
             @PathVariable UUID id,
             @Valid @RequestBody MemberStatusUpdateRequest request
     ) {
-        var updated = memberService.updateStatus(id.toString(), request);
+        var updated = memberUseCase.updateStatus(new UpdateMemberStatusCommand(id, request.status()));
         return ResponseEntity.ok(new MemberSummaryResponse(
                 updated.getId(),
                 updated.getEmail(),
@@ -72,7 +75,7 @@ public class MemberController {
 
     @PostMapping("/sync")
     public ResponseEntity<MemberSummaryResponse> syncMember(@Valid @RequestBody MemberCreateRequest request) {
-        var saved = memberService.upsert(request);
+        var saved = memberUseCase.upsert(new SyncMemberCommand(request.email(), request.name()));
         return ResponseEntity.ok(new MemberSummaryResponse(
                 saved.getId(),
                 saved.getEmail(),
