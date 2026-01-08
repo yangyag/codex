@@ -9,7 +9,7 @@ type Props = {
 export default function UsersPage({ token }: Props) {
   const [page, setPage] = useState(0);
   const pageSize = 10;
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['users', page],
     queryFn: () => fetchUsers(token, page, pageSize),
     keepPreviousData: true
@@ -26,7 +26,8 @@ export default function UsersPage({ token }: Props) {
       {isLoading && <div>불러오는 중...</div>}
       {isError && <div className="error">목록을 불러오지 못했습니다.</div>}
       {data && (
-        <>
+        <div className="table-wrapper">
+          {isFetching && <div className="loading-overlay">불러오는 중...</div>}
           <table className="table">
             <thead>
               <tr>
@@ -47,22 +48,24 @@ export default function UsersPage({ token }: Props) {
               ))}
             </tbody>
           </table>
-          <div className="pagination">
-            <button className="btn" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-              이전
-            </button>
-            <span>
-              {data.page + 1} / {Math.max(1, data.totalPages)}
-            </span>
-            <button
-              className="btn"
-              disabled={page + 1 >= data.totalPages}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              다음
-            </button>
-          </div>
-        </>
+        </div>
+      )}
+      {data && (
+        <div className="pagination">
+          <button className="btn" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+            이전
+          </button>
+          <span className="page-info">
+            {data.page + 1} / {Math.max(1, data.totalPages)}
+          </span>
+          <button
+            className="btn"
+            disabled={page + 1 >= data.totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            다음
+          </button>
+        </div>
       )}
     </div>
   );
