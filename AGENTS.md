@@ -5,3 +5,4 @@
 - 인증/인증 스택: JWT 기반, Spring Security + Spring Cloud Gateway 라우팅(차후 추가).
 - 데이터: Flyway 마이그레이션, 서비스별 DB/스키마 분리 방향.
 - Git 규칙: 커밋 메시지는 반드시 한글로 작성.
+- 테스트 정책: JUnit 5 기반 TDD를 기본으로 하고, 통합 테스트는 Testcontainers(PostgreSQL) 사용. 가능하면 레드-그린-리팩터 순서로 진행하며, 목/스텁은 최소화.
