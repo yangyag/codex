@@ -6,3 +6,11 @@
 - 데이터: Flyway 마이그레이션, 서비스별 DB/스키마 분리 방향.
 - Git 규칙: 커밋 메시지는 반드시 한글로 작성.
 - 테스트 정책: JUnit 5 기반 TDD를 기본으로 하고, 통합 테스트는 Testcontainers(PostgreSQL) 사용. 가능하면 레드-그린-리팩터 순서로 진행하며, 목/스텁은 최소화.
+
+## 현재 아키텍처/런타임 구성
+- 인프라: `infra/docker-compose.yml`로 기동.
+  - postgres: 포트 5432, 기본 DB/계정 `msa`/`msa-password`.
+  - identity-service: 포트 8081, 0.0.0.0 바인드, JWT 인증, admin 시드 계정 `admin`/`yangyag1!`, 사용자 100명 시드, `/api/v1/auth/login`, `/api/v1/admin/users`(ADMIN만 접근).
+  - admin-web: 포트 8080, nginx로 `/admin` 경로 서비스, API_BASE 기본값은 브라우저 호스트 기준 `:8081`.
+- 접속 경로: 브라우저 `http://127.0.0.1:8080/admin` → 로그인 후 회원 목록(페이지당 10개) 표시.
+- 남은 작업 큰 줄기: Gateway 도입(라우팅/CORS 통합), admin-web 회원가입 UI/테스트, member/board 서비스 분리.
