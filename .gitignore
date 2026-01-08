@@ -1,0 +1,27 @@
+# Java/Gradle
+.gradle/
+build/
+out/
+*.log
+*.class
+
+# Node/Frontend
+node_modules/
+dist/
+.parcel-cache/
+.turbo/
+.next/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local

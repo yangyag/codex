@@ -18,10 +18,10 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - (선택) `psql` 클라이언트, `make`/`just` 등 작업 자동화 도구 설치.
 
 ## 단계 1 - 베이스 세팅
-- [ ] 리포 구조: `services/identity-service`, `services/member-service`, `services/board-service`, `gateway/api-gateway`, `apps/admin-web`, `infra/docker-compose.yml`, 결정 기록용 `adr/`.
-- [ ] 공통 도구: Gradle wrapper, JDK 21 기본선, `.editorconfig`, `README.md`, ADR 템플릿.
+- [x] 리포 구조: `services/identity-service`, `services/member-service`, `services/board-service`, `gateway/api-gateway`, `apps/admin-web`, `infra/docker-compose.yml`, 결정 기록용 `adr/`.
+- [x] 공통 도구: `.editorconfig`, `README.md`, ADR 템플릿 (Gradle wrapper는 서비스 스캐폴드 시 추가).
 - [ ] Dev/CI 기본: 웹용 Prettier/ESLint, 기본 CI 워크플로(빌드/테스트), git hooks(선택).
-- [ ] Docker Compose 베이스: Postgres 서비스, 공유 네트워크, 환경 변수 템플릿, 네임드 볼륨.
+- [x] Docker Compose 베이스: Postgres 서비스, 공유 네트워크, 환경 변수 템플릿, 네임드 볼륨.
 
 ## 단계 2 - Identity 스켈레톤
 - [ ] Spring Boot 3 스캐폴드(Web, Validation, Data JPA, Flyway, PostgreSQL driver).
