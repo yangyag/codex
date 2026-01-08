@@ -26,12 +26,12 @@ Spring Boot + React 기반의 관리자용 MSA 프로젝트입니다.
 - 커밋 메시지는 한글로 작성합니다.
 
 ## 현재 상태
-- Identity 서비스: 회원가입 API 구현(Flyway 마이그레이션, JPA, 입력 검증, 이메일 중복 처리), 단위/통합 테스트(Testcontainers) 포함.
-- `infra/docker-compose.yml`에 Postgres 15 + identity-service 빌드 항목 추가.
+- Identity 서비스: 회원가입/로그인, Flyway/JPA, 입력 검증, 이메일 중복 처리, JWT 발급.
+- Member 서비스: 멤버 테이블/시드(100명) 생성, 목록/검색, 상태 업데이트 API(`GET /api/v1/members` 등). JWT ADMIN 권한 요구.
+- Admin Web: `/admin` 경로, 로그인 후 멤버 목록(10개/페이지, 처음/끝 이동 버튼) 확인 가능. `npm run dev -- --host 0.0.0.0 --port 8080` 또는 `docker compose up admin-web`.
+- 인프라: `infra/docker-compose.yml`에 Postgres 15 + identity-service(8081) + member-service(8082) + admin-web(8080).
 - 통합 테스트는 Docker 접근 가능 시 실행되며, Docker가 없으면 자동으로 건너뜁니다.
-- 인증/로그인: JWT 기반 `/api/v1/auth/login`, 기본 관리자 계정 `admin` / `yangyag1!` 시드.
-- Admin Web: `/admin` 경로, 로그인 후 회원 목록(100명 시드, 10개/페이지) 확인 가능. `npm run dev -- --host 0.0.0.0 --port 8080` 또는 `docker compose up admin-web`으로 실행.
-- 모든 서비스는 `0.0.0.0` 바인드, 브라우저 접근 경로 예: `http://127.0.0.1:8080/admin`.
+- 브라우저 접근 경로: `http://127.0.0.1:8080/admin`, 로그인 `admin` / `yangyag1!`.
 
 ## 빠른 실행 (도커)
 ```bash

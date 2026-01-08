@@ -58,11 +58,11 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] API BASE 자동 설정: 브라우저 호스트 기반(`hostname:8081`) 기본값 적용.
 
 ## 단계 5 - Member 서비스 + Admin UI
-- [ ] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
-- [ ] 도메인: 멤버 프로필/상태/역할; 멤버 테이블 마이그레이션.
-- [ ] API: 멤버 목록/검색, 상세 조회, 상태/역할 업데이트.
-- [ ] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트.
-- [ ] Admin Web: 멤버 목록(검색/페이지네이션), 상세 드로어, 상태 토글.
+- [x] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + Postgres 공유 DB, 별도 Flyway 히스토리 테이블.
+- [x] 도메인: 멤버 프로필/상태; 멤버 테이블 마이그레이션.
+- [x] API: 멤버 목록/검색, 상태 업데이트.
+- [ ] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트. *(게이트웨이 미도입, JWT 필터로 ADMIN 요구)*
+- [x] Admin Web: 멤버 목록(검색/페이지네이션), 페이징 처음/끝 이동. *(상세/상태 토글 미구현)*
 
 ## 단계 6 - Board 서비스 + Admin UI
 - [ ] `board-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.

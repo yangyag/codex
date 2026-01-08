@@ -4,6 +4,12 @@ const API_BASE =
     ? `${window.location.protocol}//${window.location.hostname}:8081`
     : 'http://127.0.0.1:8081');
 
+const MEMBER_API_BASE =
+  import.meta.env.VITE_MEMBER_API_BASE ||
+  (typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8082`
+    : 'http://127.0.0.1:8082');
+
 export type AuthResponse = {
   token: string;
   email: string;
@@ -39,7 +45,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
 }
 
 export async function fetchUsers(token: string, page: number, size: number): Promise<PageResponse<UserSummary>> {
-  const res = await fetch(`${API_BASE}/api/v1/admin/users?page=${page}&size=${size}`, {
+  const res = await fetch(`${MEMBER_API_BASE}/api/v1/members?page=${page}&size=${size}`, {
     headers: {
       Authorization: `Bearer ${token}`
     }

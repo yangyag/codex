@@ -10,7 +10,8 @@
 ## 현재 아키텍처/런타임 구성
 - 인프라: `infra/docker-compose.yml`로 기동.
   - postgres: 포트 5432, 기본 DB/계정 `msa`/`msa-password`.
-  - identity-service: 포트 8081, 0.0.0.0 바인드, JWT 인증, admin 시드 계정 `admin`/`yangyag1!`, 사용자 100명 시드, `/api/v1/auth/login`, `/api/v1/admin/users`(ADMIN만 접근).
-  - admin-web: 포트 8080, nginx로 `/admin` 경로 서비스, API_BASE 기본값은 브라우저 호스트 기준 `:8081`.
-- 접속 경로: 브라우저 `http://127.0.0.1:8080/admin` → 로그인 후 회원 목록(페이지당 10개) 표시.
-- 남은 작업 큰 줄기: Gateway 도입(라우팅/CORS 통합), admin-web 회원가입 UI/테스트, member/board 서비스 분리.
+  - identity-service(8081): 0.0.0.0 바인드, JWT 인증, admin 시드 계정 `admin`/`yangyag1!`, 사용자 100명 시드, `/api/v1/auth/login`.
+  - member-service(8082): 0.0.0.0 바인드, 멤버 100명 시드, 목록/검색/상태 변경 API(`GET /api/v1/members`, `PATCH /api/v1/members/{id}/status`), JWT ADMIN 요구.
+  - admin-web(8080): nginx로 `/admin` 경로 서비스, 로그인 후 멤버 목록(10개/페이지, 처음/끝 이동). API_BASE는 브라우저 호스트 기준 8081/8082가 기본.
+- 접속 경로: 브라우저 `http://127.0.0.1:8080/admin` → 로그인 `admin`/`yangyag1!` → 멤버 목록 확인.
+- 남은 작업 큰 줄기: Gateway 도입(라우팅/CORS 통합), admin-web 회원가입 UI/테스트, member 상세/상태 토글 UI, board 서비스 추가.
