@@ -40,14 +40,7 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
 
   return (
     <div className="card">
-      <div className="tabs">
-        <button className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>
-          로그인
-        </button>
-        <button className={`tab ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>
-          회원가입
-        </button>
-      </div>
+      <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
       <form onSubmit={handleSubmit} className="form">
         <label>
           아이디
@@ -81,10 +74,10 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
           <small className="hint">{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}</small>
           <button
             type="button"
-            className="btn ghost"
+            className="link-button"
             onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
           >
-            {mode === 'login' ? '회원가입으로 전환' : '로그인으로 전환'}
+            {mode === 'login' ? '회원가입' : '로그인'}
           </button>
         </div>
       </form>
