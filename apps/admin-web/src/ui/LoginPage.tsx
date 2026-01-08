@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { login } from '../utils/api';
+import { login, signup } from '../utils/api';
 
 type Props = {
   onLogin: (token: string, email: string) => void;
@@ -8,8 +8,11 @@ type Props = {
 };
 
 export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword = '' }: Props) {
+  type Mode = 'login' | 'signup';
+  const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState(defaultPassword);
+  const [confirm, setConfirm] = useState(defaultPassword);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,10 +21,18 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
     setLoading(true);
     setError(null);
     try {
+      if (mode === 'signup') {
+        if (password !== confirm) {
+          setError('비밀번호가 일치하지 않습니다.');
+          setLoading(false);
+          return;
+        }
+        await signup(email, password);
+      }
       const res = await login(email, password);
       onLogin(res.token, res.email);
     } catch (err) {
-      setError('로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.');
+      setError(mode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -29,7 +40,14 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
 
   return (
     <div className="card">
-      <h2>관리자 로그인</h2>
+      <div className="tabs">
+        <button className={`tab ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>
+          로그인
+        </button>
+        <button className={`tab ${mode === 'signup' ? 'active' : ''}`} onClick={() => setMode('signup')}>
+          회원가입
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="form">
         <label>
           아이디
@@ -44,10 +62,31 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
             placeholder="••••••••"
           />
         </label>
+        {mode === 'signup' && (
+          <label>
+            비밀번호 확인
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="••••••••"
+            />
+          </label>
+        )}
         {error && <div className="error">{error}</div>}
         <button className="btn primary" type="submit" disabled={loading}>
-          {loading ? '로그인 중...' : '로그인'}
+          {loading ? '처리 중...' : mode === 'login' ? '로그인' : '회원가입'}
         </button>
+        <div className="toggle-row">
+          <small className="hint">{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}</small>
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+          >
+            {mode === 'login' ? '회원가입으로 전환' : '로그인으로 전환'}
+          </button>
+        </div>
       </form>
     </div>
   );

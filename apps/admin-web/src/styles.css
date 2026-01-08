@@ -105,6 +105,48 @@ input:focus {
   cursor: not-allowed;
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  border: none;
+}
+
+.hint {
+  color: #cbd5e1;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
 .error {
   color: #f87171;
   font-size: 14px;
