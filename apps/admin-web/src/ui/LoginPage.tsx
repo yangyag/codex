@@ -16,23 +16,40 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const validate = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('올바른 이메일 형식을 입력하세요.');
+      return false;
+    }
+    if (password.length < 8) {
+      setError('비밀번호는 8자 이상이어야 합니다.');
+      return false;
+    }
+    if (mode === 'signup' && password !== confirm) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
+      if (!validate()) {
+        setLoading(false);
+        return;
+      }
       if (mode === 'signup') {
-        if (password !== confirm) {
-          setError('비밀번호가 일치하지 않습니다.');
-          setLoading(false);
-          return;
-        }
         await signup(email, password);
       }
       const res = await login(email, password);
       onLogin(res.token, res.email);
     } catch (err) {
-      setError(mode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.');
+      const message = err instanceof Error ? err.message : null;
+      setError(message || (mode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -43,8 +60,8 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
       <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
       <form onSubmit={handleSubmit} className="form">
         <label>
-          아이디
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin" />
+          이메일
+          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
         </label>
         <label>
           비밀번호

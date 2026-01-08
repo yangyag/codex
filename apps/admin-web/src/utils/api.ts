@@ -38,10 +38,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
-  if (!res.ok) {
-    throw new Error('login failed');
-  }
-  return res.json();
+  return handleJson(res, '로그인에 실패했습니다.');
 }
 
 export type SignupResponse = {
@@ -58,10 +55,7 @@ export async function signup(email: string, password: string): Promise<SignupRes
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
-  if (!res.ok) {
-    throw new Error('signup failed');
-  }
-  return res.json();
+  return handleJson(res, '회원가입에 실패했습니다.');
 }
 
 export async function fetchUsers(token: string, page: number, size: number): Promise<PageResponse<UserSummary>> {
@@ -70,8 +64,21 @@ export async function fetchUsers(token: string, page: number, size: number): Pro
       Authorization: `Bearer ${token}`
     }
   });
+  return handleJson(res, '회원 목록을 불러오지 못했습니다.');
+}
+
+async function handleJson<T>(res: Response, defaultMessage: string): Promise<T> {
   if (!res.ok) {
-    throw new Error('fetch users failed');
+    try {
+      const data = await res.json();
+      const message = data?.message || defaultMessage;
+      throw new Error(message);
+    } catch (e) {
+      if (e instanceof Error && e.message !== defaultMessage) {
+        throw e;
+      }
+      throw new Error(defaultMessage);
+    }
   }
   return res.json();
 }
