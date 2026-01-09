@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+coverage
+*.log
+apps/admin-web/node_modules
+apps/admin-web/dist
+services/**/build
+gateway/**/build

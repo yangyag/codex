@@ -2,13 +2,20 @@ import { FormEvent, useState } from 'react';
 import { login, signup } from '../utils/api';
 
 type Props = {
-  onLogin: (token: string, email: string) => void;
+  onLogin: (token: string, email: string, role: string) => void;
   defaultEmail?: string;
   defaultPassword?: string;
   allowSignup?: boolean;
+  allowAdminId?: boolean;
 };
 
-export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword = '', allowSignup = true }: Props) {
+export default function LoginPage({
+  onLogin,
+  defaultEmail = '',
+  defaultPassword = '',
+  allowSignup = true,
+  allowAdminId = false,
+}: Props) {
   type Mode = 'login' | 'signup';
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState(defaultEmail);
@@ -19,8 +26,10 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
   const currentMode: Mode = allowSignup ? mode : 'login';
 
   const validate = () => {
+    const normalizedEmail = email.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const isAdminId = allowAdminId && normalizedEmail.toLowerCase() === 'admin';
+    if (!emailRegex.test(normalizedEmail) && !isAdminId) {
       setError('올바른 이메일 형식을 입력하세요.');
       return false;
     }
@@ -39,21 +48,25 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
     e.preventDefault();
     setLoading(true);
     setError(null);
+    const normalizedEmail = email.trim();
     try {
       if (!validate()) {
         setLoading(false);
         return;
       }
       if (currentMode === 'signup') {
-        await signup(email, password);
+        await signup(normalizedEmail, password);
       }
-      const res = await login(email, password);
-      onLogin(res.token, res.email);
+      const res = await login(normalizedEmail, password);
+      setEmail(normalizedEmail);
+      onLogin(res.token, res.email, res.role);
     } catch (err) {
       const message = err instanceof Error ? err.message : null;
       setError(
         message ||
-          (currentMode === 'login' ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.' : '회원가입에 실패했습니다.')
+          (currentMode === 'login'
+            ? '로그인에 실패했습니다. 아이디/비밀번호를 확인하세요.'
+            : '회원가입에 실패했습니다.')
       );
     } finally {
       setLoading(false);
@@ -66,7 +79,11 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
       <form onSubmit={handleSubmit} className="form">
         <label>
           아이디(이메일)
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={allowAdminId ? 'admin 또는 admin@example.com' : 'admin@example.com'}
+          />
         </label>
         <label>
           비밀번호
@@ -94,7 +111,9 @@ export default function LoginPage({ onLogin, defaultEmail = '', defaultPassword 
         </button>
         {allowSignup && (
           <div className="toggle-row">
-            <small className="hint">{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}</small>
+            <small className="hint">
+              {mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}
+            </small>
             <button
               type="button"
               className="link-button"

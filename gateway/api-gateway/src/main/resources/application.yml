@@ -1,0 +1,41 @@
+server:
+  port: ${SERVER_PORT:8080}
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      routes:
+        - id: identity-service
+          uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/admin/**
+        - id: member-service
+          uri: ${MEMBER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/members/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+jwt:
+  secret: ${JWT_SECRET:change-me-please-change-me-32bytes}
+  expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+
+gateway:
+  security:
+    open-paths:
+      - /api/v1/auth/login
+      - /api/v1/auth/signup
+      - /api/v1/members/sync
+      - /actuator/**
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080}

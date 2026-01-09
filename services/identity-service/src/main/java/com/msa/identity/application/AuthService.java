@@ -4,7 +4,9 @@ import com.msa.identity.application.command.LoginCommand;
 import com.msa.identity.application.port.AuthUseCase;
 import com.msa.identity.domain.User;
 import com.msa.identity.domain.UserRepository;
+import com.msa.identity.domain.UserStatus;
 import com.msa.identity.security.JwtProvider;
+import com.msa.identity.web.exception.BlockedUserException;
 import com.msa.identity.web.exception.InvalidCredentialsException;
 import com.msa.identity.web.response.AuthResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +32,10 @@ public class AuthService implements AuthUseCase {
 
         if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
             throw new InvalidCredentialsException();
+        }
+
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new BlockedUserException();
         }
 
         String token = jwtProvider.generateToken(user.getEmail(), user.getRole());

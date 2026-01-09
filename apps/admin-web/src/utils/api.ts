@@ -27,6 +27,7 @@ export type PageResponse<T> = {
 export type UserSummary = {
   id: string;
   email: string;
+  name: string;
   role: string;
   status: string;
   createdAt: string;
@@ -36,7 +37,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
   const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
   return handleJson(res, '로그인에 실패했습니다.');
 }
@@ -53,7 +54,7 @@ export async function signup(email: string, password: string): Promise<SignupRes
   const res = await fetch(`${API_BASE}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
   return handleJson(res, '회원가입에 실패했습니다.');
 }
@@ -66,17 +67,49 @@ export async function fetchUsers(
 ): Promise<PageResponse<UserSummary>> {
   const params = new URLSearchParams({
     page: String(page),
-    size: String(size)
+    size: String(size),
   });
   if (query && query.trim().length > 0) {
     params.set('q', query.trim());
   }
   const res = await fetch(`${MEMBER_API_BASE}/api/v1/members?${params.toString()}`, {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
   return handleJson(res, '회원 목록을 불러오지 못했습니다.');
+}
+
+export async function updateMemberStatus(
+  token: string,
+  memberId: string,
+  nextStatus: string
+): Promise<UserSummary> {
+  const res = await fetch(`${MEMBER_API_BASE}/api/v1/members/${memberId}/status`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: nextStatus }),
+  });
+  return handleJson(res, '회원 상태를 변경하지 못했습니다.');
+}
+
+export async function updateIdentityUserStatus(
+  token: string,
+  email: string,
+  nextStatus: string
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/admin/users/${encodeURIComponent(email)}/status`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: nextStatus }),
+  });
+  await handleJson(res, '로그인 시스템 상태 동기화에 실패했습니다.');
 }
 
 async function handleJson<T>(res: Response, defaultMessage: string): Promise<T> {

@@ -11,6 +11,7 @@ import com.msa.identity.domain.UserRepository;
 import com.msa.identity.domain.UserRole;
 import com.msa.identity.domain.UserStatus;
 import com.msa.identity.security.JwtProvider;
+import com.msa.identity.web.exception.BlockedUserException;
 import com.msa.identity.web.exception.InvalidCredentialsException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,5 +70,15 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(command))
                 .isInstanceOf(InvalidCredentialsException.class);
+    }
+
+    @Test
+    void login_throws_when_user_blocked() {
+        LoginCommand command = new LoginCommand("blocked@example.com", "password123");
+        User user = new User(command.email(), passwordEncoder.encode(command.password()), UserRole.USER, UserStatus.BLOCKED);
+        given(userRepository.findByEmail(command.email())).willReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.login(command))
+                .isInstanceOf(BlockedUserException.class);
     }
 }

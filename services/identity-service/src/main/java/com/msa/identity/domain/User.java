@@ -82,6 +82,10 @@ public class User {
         return status;
     }
 
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }

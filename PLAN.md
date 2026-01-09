@@ -26,7 +26,7 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 ## 단계 1 - 베이스 세팅
 - [x] 리포 구조: `services/identity-service`, `services/member-service`, `services/board-service`, `gateway/api-gateway`, `apps/admin-web`, `infra/docker-compose.yml`, 결정 기록용 `adr/`.
 - [x] 공통 도구: `.editorconfig`, `README.md`, ADR 템플릿 (Gradle wrapper는 서비스 스캐폴드 시 추가).
-- [ ] Dev/CI 기본: 웹용 Prettier/ESLint, 기본 CI 워크플로(빌드/테스트), git hooks(선택).
+- [x] Dev/CI 기본: 웹용 Prettier/ESLint, 기본 CI 워크플로(빌드/테스트), git hooks(선택).
 - [x] Docker Compose 베이스: Postgres 서비스, 공유 네트워크, 환경 변수 템플릿, 네임드 볼륨.
 
 ## 단계 2 - Identity 스켈레톤
@@ -41,7 +41,7 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] 로그인 엔드포인트(이메일+비밀번호, JWT 액세스 토큰).
 - [x] JWT 프로바이더(HS256 키, 만료 설정), 인증 오류 모델.
 - [x] 시큐리티 설정: 패스워드 인코더, 인증 매니저, 보호 경로용 Bearer 필터.
-- [ ] Spring Cloud Gateway 스캐폴드: identity(및 향후 서비스) 라우팅, JWT 검증 필터, CORS 규칙. *(보류, 현재 identity 직결)*
+- [x] Spring Cloud Gateway 스캐폴드: identity(및 향후 서비스) 라우팅, JWT 검증 필터, CORS 규칙.
 - [x] Compose 업데이트: gateway ↔ identity ↔ Postgres 연동; 스모크 테스트 스크립트 또는 Postman 컬렉션. *(identity + admin-web + postgres 구성 완료)*
 - [x] 기본 관리자 계정(admin/yangyag1!) 시드.
 - [x] 서비스 바인드 주소를 `0.0.0.0`으로 노출.
@@ -49,11 +49,11 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 ## 단계 4 - Admin Web (초기)
 - [x] Vite + React + TypeScript 스캐폴드, TanStack Query, React Router.
 - [x] 인증 인지 API 클라이언트(fetch), 토큰 저장(localStorage).
-- [ ] 페이지: 회원가입, 로그인; 성공 시 토큰 저장 후 보호 영역으로 리다이렉트. *(로그인 완료, 회원가입 UI 미구현)*
+- [x] 페이지: 회원가입, 로그인; 성공 시 토큰 저장 후 보호 영역으로 리다이렉트.
 - [x] Admin 레이아웃 셸과 보호 라우트 가드(로그인 상태 전환).
-- [ ] 기본 테스트: 컴포넌트 테스트/린트. *(미작성)*
+- [x] 기본 테스트: 컴포넌트 테스트/린트. *(Vitest 단위 테스트 + lint/format 스크립트)*
 - [x] 관리자 페이지 경로: `/admin` 노출, 서버 바인드 `0.0.0.0`.
-- [x] 회원 관리 메뉴: 사용자 목록 조회(페이지당 10개), 100명 테스트 데이터 시드, 목록 확인 가능.
+- [x] 회원 관리 메뉴: 사용자 목록 조회(페이지당 10개), 100명 테스트 데이터 시드, 목록 확인 가능, 상세/상태 변경 UI 추가.
 - [x] `http://127.0.0.1:8080/admin` 접속 스모크 확인(수동, 현재 compose 직결).
 - [x] API BASE 자동 설정: 브라우저 호스트 기반(`hostname:8081`) 기본값 적용.
 - [x] 회원가입 페이지 추가(관리자 계정 외 신규 가입) 및 성공 후 로그인/리다이렉트 플로우.
@@ -67,7 +67,11 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] 도메인: 멤버 프로필/상태; 멤버 테이블 마이그레이션.
 - [x] API: 멤버 목록/검색, 상태 업데이트, 외부 동기화 엔드포인트(`/api/v1/members/sync`).
 - [ ] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트. *(게이트웨이 미도입, JWT 필터로 ADMIN 요구)*
-- [x] Admin Web: 멤버 목록(검색/페이지네이션), 페이징 처음/끝 이동. *(상세/상태 토글 미구현)*
+- [x] Admin Web: 멤버 목록(검색/페이지네이션), 페이징 처음/끝 이동, 상세/상태 토글.
+
+## 추가 진행 사항
+- Identity 서비스: BLOCKED 상태 사용자는 로그인 차단.
+- Admin Web: 상태 변경 시 identity/member 서비스 동기화.
 
 ## 단계 6 - Board 서비스 + Admin UI
 - [ ] `board-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
