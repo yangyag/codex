@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './LoginPage';
 import UsersPage from './UsersPage';
 import BoardsPage from './BoardsPage';
+import BoardReaderPage from './BoardReaderPage';
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ export default function App() {
   const [adminRole, setAdminRole] = useState<string | null>(
     () => localStorage.getItem('adminRole') ?? null
   );
-  const [activeAdminTab, setActiveAdminTab] = useState<'users' | 'boards'>('users');
+  const [activeAdminTab, setActiveAdminTab] = useState<'users' | 'boards' | 'reader'>('users');
 
   const handleUserLogin = (nextToken: string, nextEmail: string, _nextRole: string) => {
     localStorage.setItem('userToken', nextToken);
@@ -104,11 +105,19 @@ export default function App() {
                       >
                         게시판 관리
                       </button>
+                      <button
+                        className={`tab ${activeAdminTab === 'reader' ? 'active' : ''}`}
+                        onClick={() => setActiveAdminTab('reader')}
+                      >
+                        게시판 보기
+                      </button>
                     </nav>
                     {activeAdminTab === 'users' ? (
                       <UsersPage token={adminToken} />
-                    ) : (
+                    ) : activeAdminTab === 'boards' ? (
                       <BoardsPage token={adminToken} />
+                    ) : (
+                      <BoardReaderPage token={adminToken} />
                     )}
                   </div>
                 ) : (
