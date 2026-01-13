@@ -54,6 +54,7 @@ services:
       SERVER_PORT: ${GATEWAY_SERVER_PORT:-8080}
       IDENTITY_SERVICE_URL: http://identity-service:${IDENTITY_PORT:-8081}
       MEMBER_SERVICE_URL: http://member-service:${MEMBER_PORT:-8082}
+      BOARD_SERVICE_URL: http://board-service:${BOARD_PORT:-8084}
       JWT_SECRET: ${JWT_SECRET:-change-me-please-change-me-32bytes}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}
     ports:
@@ -72,6 +73,7 @@ services:
     environment:
       - VITE_API_BASE=http://127.0.0.1:${GATEWAY_PORT:-8083}
       - VITE_MEMBER_API_BASE=http://127.0.0.1:${GATEWAY_PORT:-8083}
+      - VITE_BOARD_API_BASE=http://127.0.0.1:${GATEWAY_PORT:-8083}
     ports:
       - "8080:8080"
     networks:
@@ -94,6 +96,26 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-please-change-me-32bytes}
     ports:
       - "${MEMBER_PORT:-8082}:${MEMBER_PORT:-8082}"
+    networks:
+      - msa-net
+
+  board-service:
+    build:
+      context: ../services/board-service
+    container_name: board-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: msa
+      DB_USERNAME: msa
+      DB_PASSWORD: msa-password
+      SERVER_PORT: ${BOARD_PORT:-8084}
+      JWT_SECRET: ${JWT_SECRET:-change-me-please-change-me-32bytes}
+    ports:
+      - "${BOARD_PORT:-8084}:${BOARD_PORT:-8084}"
     networks:
       - msa-net
 

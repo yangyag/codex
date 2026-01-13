@@ -14,6 +14,9 @@ public class GatewaySecurityProperties {
             "/api/v1/auth/signup",
             "/api/v1/members/sync",
             "/actuator/**");
+    private List<String> adminPaths = Arrays.asList(
+            "/api/v1/members/**",
+            "/api/v1/admin/**");
 
     public List<String> getOpenPaths() {
         return openPaths;
@@ -21,5 +24,13 @@ public class GatewaySecurityProperties {
 
     public void setOpenPaths(List<String> openPaths) {
         this.openPaths = openPaths;
+    }
+
+    public List<String> getAdminPaths() {
+        return adminPaths;
+    }
+
+    public void setAdminPaths(List<String> adminPaths) {
+        this.adminPaths = adminPaths;
     }
 }

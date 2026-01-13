@@ -50,6 +50,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return unauthorized(exchange, "Invalid or expired token");
         }
 
+        if (requiresAdmin(path) && !"ADMIN".equalsIgnoreCase(claims.role())) {
+            return forbidden(exchange, "ADMIN role required");
+        }
+
         ServerHttpRequest authenticatedRequest = request.mutate()
                 .header("X-Auth-Email", claims.email())
                 .header("X-Auth-Role", claims.role())
@@ -63,12 +67,29 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         return openPaths.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
+    private boolean requiresAdmin(String path) {
+        List<String> adminPaths = securityProperties.getAdminPaths();
+        return adminPaths.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
+
     private Mono<Void> unauthorized(ServerWebExchange exchange, String message) {
         var response = exchange.getResponse();
         if (response.isCommitted()) {
             return response.setComplete();
         }
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        byte[] bytes = ("{\"message\":\"" + message + "\"}").getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+        return response.writeWith(Mono.just(buffer));
+    }
+
+    private Mono<Void> forbidden(ServerWebExchange exchange, String message) {
+        var response = exchange.getResponse();
+        if (response.isCommitted()) {
+            return response.setComplete();
+        }
+        response.setStatusCode(HttpStatus.FORBIDDEN);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         byte[] bytes = ("{\"message\":\"" + message + "\"}").getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);

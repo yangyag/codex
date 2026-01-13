@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './LoginPage';
 import UsersPage from './UsersPage';
+import BoardsPage from './BoardsPage';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ export default function App() {
   const [adminRole, setAdminRole] = useState<string | null>(
     () => localStorage.getItem('adminRole') ?? null
   );
+  const [activeAdminTab, setActiveAdminTab] = useState<'users' | 'boards'>('users');
 
   const handleUserLogin = (nextToken: string, nextEmail: string, _nextRole: string) => {
     localStorage.setItem('userToken', nextToken);
@@ -88,7 +90,27 @@ export default function App() {
               </header>
               <main className="app-main">
                 {adminToken && adminRole === 'ADMIN' ? (
-                  <UsersPage token={adminToken} />
+                  <div className="admin-body">
+                    <nav className="admin-tabs">
+                      <button
+                        className={`tab ${activeAdminTab === 'users' ? 'active' : ''}`}
+                        onClick={() => setActiveAdminTab('users')}
+                      >
+                        회원 관리
+                      </button>
+                      <button
+                        className={`tab ${activeAdminTab === 'boards' ? 'active' : ''}`}
+                        onClick={() => setActiveAdminTab('boards')}
+                      >
+                        게시판 관리
+                      </button>
+                    </nav>
+                    {activeAdminTab === 'users' ? (
+                      <UsersPage token={adminToken} />
+                    ) : (
+                      <BoardsPage token={adminToken} />
+                    )}
+                  </div>
                 ) : (
                   <LoginPage
                     onLogin={handleAdminLogin}

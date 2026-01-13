@@ -66,18 +66,35 @@ MSA 관리자 프로젝트의 단계별 계획을 기록합니다. 진행 상황
 - [x] `member-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + Postgres 공유 DB, 별도 Flyway 히스토리 테이블.
 - [x] 도메인: 멤버 프로필/상태; 멤버 테이블 마이그레이션.
 - [x] API: 멤버 목록/검색, 상태 업데이트, 외부 동기화 엔드포인트(`/api/v1/members/sync`).
-- [ ] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트. *(게이트웨이 미도입, JWT 필터로 ADMIN 요구)*
+- [x] 보안: 게이트웨이 라우팅 + 역할 검증; gateway ↔ member-service 계약 테스트. *(게이트웨이 도입, ADMIN 필터/기본 통합 테스트 완료 — 필요 시 계약 테스트 확장)*
 - [x] Admin Web: 멤버 목록(검색/페이지네이션), 페이징 처음/끝 이동, 상세/상태 토글.
+
+### 단계 5 세부 작업
+- 게이트웨이 라우팅 확정: member-service 경로 매핑(yaml), CORS/헤더 정책 통일, 인증 헤더 전달 규칙 정의. 테스트: Gateway 슬라이스/통합 테스트로 라우팅·필터 검증(ADMIN 경로 필터 포함).
+- JWT 역할 검증 설계: ADMIN 롤 검증 필터(또는 글로벌 시큐리티 설정) 추가, 거부 시 문제 응답 통일. 테스트: Spring Security 통합 테스트로 허용/거부 케이스 커버.
+- 계약/계약 테스트: Gateway↔member-service 스펙 고정(엔드포인트, 스키마, 오류 모델) 후 컨슈머/프로바이더 계약 테스트 작성; 최소 RestAssured+Testcontainers로 end-to-end 스모크. *(기본 라우팅 통합 테스트 작성됨; 컨슈머/프로바이더 계약은 추가 시나리오)*
+- 로컬 실행/Compose 갱신: Gateway 포함된 docker-compose 프로파일 업데이트, 환경변수/포트 정리.
+- Admin Web 연동 검증: API_BASE를 gateway 기본값(8083)으로 전환, 멤버 목록/상태 변경이 게이트웨이 경유로 동작하는지 e2e(수동+간단한 Vitest mock fetch) 확인.
+- 차단 상태 규칙 반영: BLOCKED 로그인 거부, 상태 토글 시 identity/member 동기화 흐름 정의; 각각 단위/통합 테스트 추가.
 
 ## 추가 진행 사항
 - Identity 서비스: BLOCKED 상태 사용자는 로그인 차단.
 - Admin Web: 상태 변경 시 identity/member 서비스 동기화.
 
 ## 단계 6 - Board 서비스 + Admin UI
-- [ ] `board-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
-- [ ] 도메인: 게시판(이름, 공개 범위), 게시글(board_id, author_id, 제목, 본문, 상태, 타임스탬프).
-- [ ] API: 게시판/게시글 CRUD, 페이지네이션/필터링, 소유/역할 검사.
+- [x] `board-service` 스캐폴드(Web, Validation, Data JPA, Flyway) + 별도 DB/스키마.
+- [x] 도메인: 게시판(이름, 공개 범위), 게시글(board_id, author_id, 제목, 본문, 상태, 타임스탬프).
+- [x] API: 게시판/게시글 CRUD, 페이지네이션/필터링, 소유/역할 검사.
 - [ ] Admin Web: 게시판 관리, 게시글 목록, 작성/수정.
+
+### 단계 6 세부 작업
+- 스키마/마이그레이션: boards(이름, 공개 범위, 상태, 타임스탬프) + posts(board_id, author_id, 제목, 본문, 상태, 타임스탬프) 설계, 인덱스/제약(FK, 상태·board_id 필터) 정의 후 Flyway 적용.
+- 서비스/도메인: 보드/게시글 엔터티, 상태 값 정의, 생성 팩토리/유스케이스(등록/수정/조회/삭제) 구현. 비즈니스 규칙(공개 범위, 상태 전환) 분리.
+- API/보안: 보드 CRUD(ADMIN 전용), 게시글 CRUD(ADMIN 또는 author), 목록/검색/필터(보드별, 상태별, 작성자) + 페이지네이션. JWT 인증/역할 검사, 예외 응답 모델 정리.
+- 테스트: 유스케이스 단위 테스트, JPA/Flyway + Testcontainers(PostgreSQL) 통합 테스트, 웹 레이어(MockMvc/WebTestClient)로 권한/필터링 검증.
+- 게이트웨이/라우팅: gateway에 board-service 경로 추가, ADMIN 경로 필터와 헤더 전달 규칙 확인, 간단한 라우팅 통합 테스트 추가. *(라우팅/헤더 전달 완료, 통합 테스트 추가 필요 시 보강)*
+- Admin Web: 게시판 목록/생성/수정 UI, 게시글 목록/필터/작성·수정 UI, 상태 토글/삭제 흐름, 게이트웨이 기반 API 클라이언트 추가, 기본 Vitest 수준 API 호출 테스트. *(미착수)*
+- Compose/로컬 실행: board-service 컨테이너와 별도 DB 설정 추가, 환경 변수 정리, 스모크 스크립트 또는 간단한 curl 시나리오 준비. *(compose 반영 완료)*
 
 ## 단계 7 - 품질 + 운영
 - [ ] 가시성: 구조화 로깅, 요청 ID, Micrometer 메트릭, OpenTelemetry 트레이싱 훅.

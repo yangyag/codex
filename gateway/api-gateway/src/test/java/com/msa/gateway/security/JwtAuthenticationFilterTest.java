@@ -65,8 +65,26 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void shouldRejectWhenRoleIsNotAdminForAdminPath() {
+        String token = createToken("USER");
+        MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/api/v1/members")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .build());
+        AtomicBoolean called = new AtomicBoolean(false);
+        GatewayFilterChain chain = ex -> {
+            called.set(true);
+            return Mono.empty();
+        };
+
+        StepVerifier.create(filter.filter(exchange, chain)).verifyComplete();
+
+        assertThat(called).isFalse();
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
     void shouldPassThroughWithValidToken() {
-        String token = createToken();
+        String token = createToken("ADMIN");
         MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/api/v1/members")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .build());
@@ -87,10 +105,10 @@ class JwtAuthenticationFilterTest {
         assertThat(roleHeader.get()).isEqualTo("ADMIN");
     }
 
-    private String createToken() {
+    private String createToken(String role) {
         return Jwts.builder()
                 .setSubject("user@example.com")
-                .claim("role", "ADMIN")
+                .claim("role", role)
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
